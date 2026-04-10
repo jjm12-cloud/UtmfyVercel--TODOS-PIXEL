@@ -7,12 +7,13 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <!-- ======== UTMIFY TRACKING ======== -->
+  <!-- O script abaixo captura automaticamente todas as UTMs da URL -->
   <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-token="X0lgVt07B3koWx1e2nIhGRRJfsce1A9M54AJ" async defer></script>
 
-  <!-- ======== META PIXEL ======== -->
+  <!-- ======== META PIXEL (apenas PageView — conversão feita pelo backend via UTMfy) ======== -->
   <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1719666678995507');
+    fbq('init', '3801913710053587');
     fbq('track', 'PageView');
   </script>
 
@@ -40,7 +41,7 @@
     .overlay { position:fixed; inset:0; background:rgba(15, 23, 42, 0.85); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; color:#fff; text-align:center; }
     .spinner { width:64px; height:64px; border:6px solid #f3f3f3; border-top:6px solid var(--primary); border-radius:50%; animation: spin 1s linear infinite; margin-bottom:20px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    
+
     @media (max-width: 480px) {
       .container { padding:8px; }
       .card { padding:12px; }
@@ -73,11 +74,17 @@
       <span class="label">Selecione como deseja pagar:</span>
       <div class="methods">
         <div class="method-card" id="opt-mpesa" onclick="selectMethod('mpesa')">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJ1Qp-bXFox-gmm2hYXQfI_d5P1V0HRy6ixA&s" alt="M-Pesa">
+          <svg width="80" height="32" viewBox="0 0 160 55" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 6px auto;">
+            <rect width="160" height="55" rx="6" fill="#e2001a"/>
+            <text x="80" y="36" font-family="Arial Black,Arial" font-weight="900" font-size="24" fill="white" text-anchor="middle" letter-spacing="1">M-PESA</text>
+          </svg>
           <span>M-Pesa</span>
         </div>
         <div class="method-card" id="opt-emola" onclick="selectMethod('emola')">
-          <img src="https://play-lh.googleusercontent.com/2TGAhJ55tiyhCwW0ZM43deGv4lUTFTBMoq83mnAO6-bU5hi2NPyKX8BN8iKt13irK7Y" alt="e-Mola">
+          <svg width="80" height="32" viewBox="0 0 160 55" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 6px auto;">
+            <rect width="160" height="55" rx="6" fill="#f7a600"/>
+            <text x="80" y="36" font-family="Arial Black,Arial" font-weight="900" font-size="24" fill="white" text-anchor="middle" letter-spacing="1">e-Mola</text>
+          </svg>
           <span>e-Mola</span>
         </div>
       </div>
@@ -88,7 +95,7 @@
       </div>
 
       <button class="btn-pay" onclick="handlePayment()">CONCLUIR PAGAMENTO</button>
-      
+
       <div class="secure-badge">🔒 Ambiente de Pagamento Criptografado</div>
     </div>
   </div>
@@ -123,21 +130,12 @@
       return alert("O número de pagamento deve ter exatamente 9 dígitos.");
     }
 
-    // --- CAPTURAR UTMs DA URL PARA A UTMIFY ---
-    const urlParams = new URLSearchParams(window.location.search);
-    const tracking = {
-      utm_source: urlParams.get('utm_source'),
-      utm_campaign: urlParams.get('utm_campaign'),
-      utm_medium: urlParams.get('utm_medium'),
-      utm_content: urlParams.get('utm_content'),
-      utm_term: urlParams.get('utm_term'),
-      src: urlParams.get('src')
-    };
-
+    // --- UTMs lidas pelo script UTMfy automaticamente via cookie/storage ---
+    // Não é necessário capturar manualmente — o backend lê via API UTMfy usando o orderId
     const loader = document.getElementById('loading-screen');
     const loadTimer = document.getElementById('load-timer');
     loader.style.display = 'flex';
-    
+
     let seconds = 45;
     const countdown = setInterval(() => {
       seconds--;
@@ -146,20 +144,17 @@
     }, 1000);
 
     try {
-      // Enviamos todos os dados + os dados de tracking para o backend
       const response = await axios.post('/api/pay', {
-        nome, 
-        email, 
-        telefone, 
-        numero, 
-        metodo: selectedMethod,
-        tracking // Enviando UTMs para o servidor processar Utmify
+        nome,
+        email,
+        telefone,
+        numero,
+        metodo: selectedMethod
+        // ✅ UTMs são enviadas pelo backend via UTMfy API — não precisam vir do frontend
       });
 
       if (response.data.success) {
-        // Pixel do Facebook (Opcional, pois o servidor já faz via Utmify)
-        if(window.fbq) fbq('track', 'Purchase', { value: 5.00, currency: 'MZN' });
-        
+        // ✅ NÃO disparar fbq('Purchase') aqui — o backend faz isso via UTMfy (evita duplicidade)
         window.location.href = "https://alwayshealthy.live/upsell-1/";
       } else {
         alert("Ocorreu um problema ao processar. Verifique seu saldo e tente novamente.");
@@ -186,6 +181,4 @@
   }, 1000);
 </script>
 </body>
-
 </html>
-
