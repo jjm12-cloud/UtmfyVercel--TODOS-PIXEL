@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento Seguro - Taxa do Google</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- ======== UTMIFY TRACKING ======== -->
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-token="X0lgVt07B3koWx1e2nIhGRRJfsce1A9M54AJ" async defer></script>
+
+  <!-- ======== META PIXEL ======== -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1719666678995507');
+    fbq('track', 'PageView');
+  </script>
+
+  <style>
+    :root{ --primary:#049D43; --accent:#1976d2; --bg:#f8fafc; --card:#ffffff; }
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:var(--bg); margin:0; color:#1e293b; line-height:1.5; }
+    .header-alert { background:#d32f2f; color:#fff; text-align:center; padding:12px; font-weight:700; font-size:14px; }
+    .container { display:flex; justify-content:center; padding:10px; }
+    .card { background:var(--card); padding:16px; max-width:450px; width:100%; border-radius:16px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); border:1px solid #e2e8f0; }
+    h2 { margin:0 0 4px 0; font-size:22px; color:#0f172a; }
+    .price { color:var(--accent); font-size:28px; font-weight:800; margin-bottom:12px; }
+    input { width:100%; padding:10px 12px; margin-bottom:8px; border-radius:8px; border:1px solid #cbd5e1; font-size:16px; box-sizing:border-box; outline:none; transition:border 0.2s; }
+    input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(25, 118, 210, 0.1); }
+    .label { font-weight:700; margin:10px 0 6px 0; display:block; font-size:13px; }
+    .methods { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; }
+    .method-card { border:2px solid #f1f5f9; border-radius:12px; padding:10px; text-align:center; cursor:pointer; transition:0.2s; background:#fff; }
+    .method-card img { height:35px; margin-bottom:6px; display:block; margin-left:auto; margin-right:auto; }
+    .method-card span { font-size:12px; font-weight:700; }
+    .method-card.selected { border-color:var(--primary); background:#f0fdf4; }
+    #phone-payment-section { display:none; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .btn-pay { background:var(--primary); color:#fff; border:none; padding:14px; width:100%; border-radius:10px; font-size:16px; font-weight:800; cursor:pointer; margin-top:8px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); box-sizing:border-box; }
+    .btn-pay:active { transform: scale(0.98); }
+    .secure-badge { text-align:center; color:var(--accent); font-size:12px; font-weight:600; margin-top:12px; padding:6px; background:#eff6ff; border-radius:6px; }
+    .overlay { position:fixed; inset:0; background:rgba(15, 23, 42, 0.85); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; color:#fff; text-align:center; }
+    .spinner { width:64px; height:64px; border:6px solid #f3f3f3; border-top:6px solid var(--primary); border-radius:50%; animation: spin 1s linear infinite; margin-bottom:20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    @media (max-width: 480px) {
+      .container { padding:8px; }
+      .card { padding:12px; }
+      h2 { font-size:18px; margin-bottom:3px; }
+      .price { font-size:24px; margin-bottom:10px; }
+      input { padding:9px 10px; margin-bottom:6px; font-size:14px; }
+      .label { margin:8px 0 5px 0; font-size:12px; }
+      .methods { gap:8px; margin-bottom:10px; }
+      .method-card { padding:8px; }
+      .method-card img { height:32px; margin-bottom:4px; }
+      .method-card span { font-size:11px; }
+      .btn-pay { padding:12px; font-size:14px; margin-top:6px; }
+      .secure-badge { margin-top:10px; padding:5px; font-size:11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-alert">⚠️ ATENÇÃO: A sua vaga expira em <span id="timer">05:00</span></div>
+
+  <div class="container">
+    <div class="card">
+      <h2>Taxa de Ativação</h2>
+      <div class="price">197,00 MZN</div><!-- Versão atualizada: 14/01/2026 -->
+
+      <input type="text" id="nome" placeholder="Nome Completo">
+      <input type="email" id="email" placeholder="E-mail para receber acesso">
+      <input type="tel" id="telefone" placeholder="WhatsApp (ex: 84xxxxxxx)">
+
+      <span class="label">Selecione como deseja pagar:</span>
+      <div class="methods">
+        <div class="method-card" id="opt-mpesa" onclick="selectMethod('mpesa')">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJ1Qp-bXFox-gmm2hYXQfI_d5P1V0HRy6ixA&s" alt="M-Pesa">
+          <span>M-Pesa</span>
+        </div>
+        <div class="method-card" id="opt-emola" onclick="selectMethod('emola')">
+          <img src="https://play-lh.googleusercontent.com/2TGAhJ55tiyhCwW0ZM43deGv4lUTFTBMoq83mnAO6-bU5hi2NPyKX8BN8iKt13irK7Y" alt="e-Mola">
+          <span>e-Mola</span>
+        </div>
+      </div>
+
+      <div id="phone-payment-section">
+        <span class="label">Número da conta (PIN no celular):</span>
+        <input type="tel" id="pay-number" maxlength="9" placeholder="Ex: 841234567">
+      </div>
+
+      <button class="btn-pay" onclick="handlePayment()">CONCLUIR PAGAMENTO</button>
+      
+      <div class="secure-badge">🔒 Ambiente de Pagamento Criptografado</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="loading-screen">
+    <div class="spinner"></div>
+    <h3 style="margin:0;">Aguardando Pagamento...</h3>
+    <p style="padding:0 20px; font-size:14px; opacity:0.9;">Por favor, verifique o seu celular. Uma notificação para inserir o seu PIN foi enviada. <br><br>Tempo restante: <span id="load-timer">45</span>s</p>
+  </div>
+
+  <script>
+  let selectedMethod = '';
+
+  function selectMethod(m) {
+    selectedMethod = m;
+    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('opt-' + m).classList.add('selected');
+    document.getElementById('phone-payment-section').style.display = 'block';
+  }
+
+  async function handlePayment() {
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const numero = document.getElementById('pay-number').value.trim();
+
+    if (!nome || !email || !numero || !selectedMethod) {
+      return alert("Por favor, preencha todos os campos e selecione o método de pagamento.");
+    }
+
+    if (numero.length !== 9) {
+      return alert("O número de pagamento deve ter exatamente 9 dígitos.");
+    }
+
+    // --- CAPTURAR UTMs DA URL PARA A UTMIFY ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const tracking = {
+      utm_source: urlParams.get('utm_source'),
+      utm_campaign: urlParams.get('utm_campaign'),
+      utm_medium: urlParams.get('utm_medium'),
+      utm_content: urlParams.get('utm_content'),
+      utm_term: urlParams.get('utm_term'),
+      src: urlParams.get('src')
+    };
+
+    const loader = document.getElementById('loading-screen');
+    const loadTimer = document.getElementById('load-timer');
+    loader.style.display = 'flex';
+    
+    let seconds = 45;
+    const countdown = setInterval(() => {
+      seconds--;
+      if (loadTimer) loadTimer.innerText = seconds;
+      if (seconds <= 0) clearInterval(countdown);
+    }, 1000);
+
+    try {
+      // Enviamos todos os dados + os dados de tracking para o backend
+      const response = await axios.post('/api/pay', {
+        nome, 
+        email, 
+        telefone, 
+        numero, 
+        metodo: selectedMethod,
+        tracking // Enviando UTMs para o servidor processar Utmify
+      });
+
+      if (response.data.success) {
+        // Pixel do Facebook (Opcional, pois o servidor já faz via Utmify)
+        if(window.fbq) fbq('track', 'Purchase', { value: 5.00, currency: 'MZN' });
+        
+        window.location.href = "https://alwayshealthy.live/upsell-1/";
+      } else {
+        alert("Ocorreu um problema ao processar. Verifique seu saldo e tente novamente.");
+      }
+    } catch (err) {
+      console.error("Erro no processamento:", err);
+      alert("Erro na rede. Tente novamente.");
+    } finally {
+      clearInterval(countdown);
+      loader.style.display = 'none';
+    }
+  }
+
+  // Timer de 5 minutos
+  let tempoRestante = 300;
+  setInterval(() => {
+    const m = Math.floor(tempoRestante / 60);
+    const s = tempoRestante % 60;
+    const timerElement = document.getElementById('timer');
+    if (timerElement) {
+      timerElement.innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+    if(tempoRestante > 0) tempoRestante--;
+  }, 1000);
+</script>
+</body>
+
+</html>
+

@@ -1,0 +1,9 @@
+{
+  "name": "checkout-e2payments-vercel",
+  "version": "1.0.0",
+  "main": "api/pay.js",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^17.2.3"
+  }
+}
