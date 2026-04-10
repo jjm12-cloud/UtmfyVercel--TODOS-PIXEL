@@ -8,14 +8,16 @@
 
   <!-- ======== UTMIFY TRACKING ======== -->
   <!-- O script abaixo captura automaticamente todas as UTMs da URL -->
-  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-token="X0lgVt07B3koWx1e2nIhGRRJfsce1A9M54AJ" async defer></script>
+  <script
+    src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+    data-utmify-token="X0lgVt07B3koWx1e2nIhGRRJfsce1A9M54AJ"
+    data-utmify-prevent-xcod-sck
+    data-utmify-prevent-subids
+    async
+    defer
+  ></script>
 
-  <!-- ======== META PIXEL (apenas PageView — conversão feita pelo backend via UTMfy) ======== -->
-  <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '3801913710053587');
-    fbq('track', 'PageView');
-  </script>
+
 
   <style>
     :root{ --primary:#049D43; --accent:#1976d2; --bg:#f8fafc; --card:#ffffff; }
