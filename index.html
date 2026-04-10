@@ -71,7 +71,7 @@
 
       <input type="text" id="nome" placeholder="Nome Completo">
       <input type="email" id="email" placeholder="E-mail para receber acesso">
-      <input type="tel" id="telefone" placeholder="WhatsApp (ex: 84xxxxxxx)">
+      <input type="tel" id="telefone" placeholder="WhatsApp (ex: 84xxxxxxxx)">
 
       <span class="label">Selecione como deseja pagar:</span>
       <div class="methods">
@@ -116,6 +116,9 @@
     document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
     document.getElementById('opt-' + m).classList.add('selected');
     document.getElementById('phone-payment-section').style.display = 'block';
+    // Placeholder dinâmico: M-Pesa = 84, e-Mola = 87
+    const payInput = document.getElementById('pay-number');
+    payInput.placeholder = m === 'mpesa' ? 'Ex: 841234567' : 'Ex: 871234567';
   }
 
   async function handlePayment() {
